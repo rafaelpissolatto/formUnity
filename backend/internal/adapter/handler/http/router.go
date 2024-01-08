@@ -8,16 +8,6 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-// NewServer returns a new HTTP server
-func NewServer(ctx context.Context, addr string, handler http.Handler) *http.Server {
-	srv := &http.Server{
-		Addr:    addr,
-		Handler: handler,
-	}
-
-	return srv
-}
-
 // NewRouter returns a new HTTP router
 func NewRouter(ctx context.Context) *chi.Mux {
 	r := chi.NewRouter()
