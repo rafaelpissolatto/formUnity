@@ -1,50 +1,47 @@
-package repository
+package memdb
 
-import "github.com/rafaelpissolatto/formUnity/backend/internal/core/domain"
+import "github.com/hashicorp/go-memdb"
 
-// memdb is a in-memory database adapter for the repository.
-type memDB struct {
-	m map[string]*domain.Volunteer
+// DB is wrapper for in-memory database connection
+type DB struct {
+	*memdb.MemDB
 }
 
-// Delete implements domain.VolunteerRepository.
-func (*memDB) Delete(volunteer *domain.Volunteer) error {
-	panic("unimplemented")
-}
-
-// FindAll implements domain.VolunteerRepository.
-func (*memDB) FindAll() ([]domain.Volunteer, error) {
-	panic("unimplemented")
-}
-
-// FindByEmail implements domain.VolunteerRepository.
-func (*memDB) FindByEmail(email string) (*domain.Volunteer, error) {
-	panic("unimplemented")
-}
-
-// FindByID implements domain.VolunteerRepository.
-func (*memDB) FindByID(id string) (*domain.Volunteer, error) {
-	panic("unimplemented")
-}
-
-// FindByPhone implements domain.VolunteerRepository.
-func (*memDB) FindByPhone(phone string) (*domain.Volunteer, error) {
-	panic("unimplemented")
-}
-
-// Store implements domain.VolunteerRepository.
-func (*memDB) Store(volunteer *domain.Volunteer) error {
-	panic("unimplemented")
-}
-
-// Update implements domain.VolunteerRepository.
-func (*memDB) Update(volunteer *domain.Volunteer) error {
-	panic("unimplemented")
-}
-
-// NewMemDB creates a new in-memory database.
-func NewMemDB() domain.VolunteerRepository {
-	return &memDB{
-		m: make(map[string]*domain.Volunteer),
+// NewDB creates a new in-memory database connection
+func NewDB() (*DB, error) {
+	// Create the DB schema (dynamic based on the Volunteer type)
+	schema := &memdb.DBSchema{
+		Tables: map[string]*memdb.TableSchema{
+			"volunteer": {
+				Name: "volunteer",
+				Indexes: map[string]*memdb.IndexSchema{
+					"id": {
+						Name:    "id",
+						Unique:  true,
+						Indexer: &memdb.StringFieldIndex{Field: "ID"},
+					},
+					"email": {
+						Name:    "email",
+						Unique:  true,
+						Indexer: &memdb.StringFieldIndex{Field: "Email"},
+					},
+					"phone": {
+						Name:    "phone",
+						Unique:  true,
+						Indexer: &memdb.StringFieldIndex{Field: "Phone"},
+					},
+				},
+			},
+		},
 	}
+
+	// Create a new data base
+	db, err := memdb.NewMemDB(schema)
+	if err != nil {
+		return nil, err
+	}
+
+	return &DB{
+		MemDB: db,
+	}, nil
 }
