@@ -27,10 +27,21 @@ func main() {
 
 	// Create a new server
 	logger.Info("Starting HTTP server...")
-	logger.Debug("HTTP server stopped")
-	srv := http.NewServer(ctx, ":8080", http.NewRouter(ctx))
-	if err := srv.ListenAndServe(); err != nil {
+	server, err := http.NewServer(ctx, ":8080", http.NewRouter(ctx, logger), logger)
+	if err != nil {
 		logger.Error(err)
 	}
 
+	// Start the server
+	if err := server.Start(ctx); err != nil {
+		logger.Error(err)
+	}
+
+	// Gracefully shutdown the server
+	defer func() {
+		logger.Info("Shutting down HTTP server...")
+		if err := server.Shutdown(ctx); err != nil {
+			logger.Error(err)
+		}
+	}()
 }
