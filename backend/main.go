@@ -27,7 +27,7 @@ func main() {
 
 	// Create a new server
 	logger.Info("Starting HTTP server...")
-	server, err := http.NewServer(ctx, ":8080", http.NewRouter(ctx, logger), logger)
+	server, err := http.NewServer(ctx, ":8081", http.NewRouter(ctx, logger), logger)
 	if err != nil {
 		logger.Error(err)
 	}
