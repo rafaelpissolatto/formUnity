@@ -1,0 +1,23 @@
+# docker-compose build and start the services backend and frontend
+# docker-compose up -d --build
+# docker-compose down
+version: '3.8'
+services:
+  # backend service is a golang app
+  backend:
+    build: 
+      context: ./
+      dockerfile: ./backend/docker/Dockerfile
+    ports:
+      - "8081:8081"
+  # TODO: enable frontend service when frontend is ready
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/app
+  #   # react frontend build and run
+  #   command: npm start
+
+    
