@@ -9,7 +9,7 @@ import (
 
 	httpadapter "github.com/rafaelpissolatto/formUnity/backend/internal/adapter/api/http"
 	postgresadapter "github.com/rafaelpissolatto/formUnity/backend/internal/adapter/repository/postgres"
-	slackadapter "github.com/rafaelpissolatto/formUnity/backend/internal/adapter/slack"
+	slackadapter "github.com/rafaelpissolatto/formUnity/backend/internal/adapter/notification/slack"
 	"github.com/rafaelpissolatto/formUnity/backend/internal/domain/volunteer"
 	"github.com/slack-go/slack"
 
