@@ -1,15 +1,16 @@
-# docker-compose build and start the services backend and frontend
-# docker-compose up -d --build
-# docker-compose down
-version: '3.8'
+# docker compose build and start the services backend and frontend
+# docker compose up -d --build
+# docker compose down
 services:
   # backend service is a golang app
-  backend:
-    build: 
-      context: ./
-      dockerfile: ./backend/docker/Dockerfile
-    ports:
-      - "8081:8081"
+  # backend:
+  #   build: 
+  #     context: ./
+  #     dockerfile: ./backend/docker/Dockerfile
+  #   ports:
+  #     - "8081:8081"
+  #   depends_on:
+  #     - database
   # TODO: enable frontend service when frontend is ready
   # frontend:
   #   build: ./frontend
@@ -19,5 +20,12 @@ services:
   #     - ./frontend:/app
   #   # react frontend build and run
   #   command: npm start
-
-    
+  database:
+    image: postgres:13
+    environment:
+      # DATABASE_URL: postgresql://user:password@localhost:5432/formunity?sslmode=disable
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: formunity
+    ports:
+      - "5432:5432" 

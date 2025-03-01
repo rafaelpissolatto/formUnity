@@ -2,14 +2,17 @@ package cmdserver
 
 import (
 	"context"
-	"database/sql"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
 	httpadapter "github.com/rafaelpissolatto/formUnity/backend/internal/adapter/api/http"
-	postgresadapter "github.com/rafaelpissolatto/formUnity/backend/internal/adapter/repository/postgres"
 	slackadapter "github.com/rafaelpissolatto/formUnity/backend/internal/adapter/notification/slack"
+	postgresadapter "github.com/rafaelpissolatto/formUnity/backend/internal/adapter/repository/postgres"
 	"github.com/rafaelpissolatto/formUnity/backend/internal/domain/volunteer"
 	"github.com/slack-go/slack"
 
@@ -18,15 +21,16 @@ import (
 
 func RunAPIServer(_ context.Context) {
 	log.Println("running api server...")
-	// database pg
-	clientDb, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+
+	// gorm / db
+	dsn := os.Getenv("DATABASE_DNS")
+	dbClient, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Println("error connecting to database")
 		panic(err)
 	}
-	defer clientDb.Close()
 
-	volunteerRepo := postgresadapter.NewPostgresVolunteerRepository(clientDb)
+	volunteerRepo := postgresadapter.NewPostgresVolunteerRepository(dbClient)
+	volunteerRepo.VolunteerMigration()
 
 	// slack notifier
 	slackClient := slack.New(os.Getenv("SLACK_TOKEN"))
@@ -42,8 +46,12 @@ func RunAPIServer(_ context.Context) {
 
 	// http
 	volunteerHandler := httpadapter.NewVolunteerHandler(volunteerService)
-	http.HandleFunc("/volunteers", volunteerHandler.AddVolunteer)
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	r := mux.NewRouter()
+	r.HandleFunc("/volunteers", volunteerHandler.AddVolunteer).Methods("POST")
+	r.HandleFunc("/volunteers/{id}", volunteerHandler.GetVolunteer).Methods("GET")
+	r.HandleFunc("/volunteers", volunteerHandler.GetAllVolunteers).Methods("GET")
+
+	if err := http.ListenAndServe(":8080", r); err != nil {
 		panic(err)
 	}
 

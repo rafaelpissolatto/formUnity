@@ -17,11 +17,19 @@ func (s *VolunteerService) AddVolunteer(v Volunteer) error {
 }
 
 func (s *VolunteerService) GetVolunteer(id ID) (Volunteer, error) {
-	return s.Repository.GetVolunteer(id)
+	v, err := s.Repository.GetVolunteer(id)
+	if err != nil {
+		return Volunteer{}, err
+	}
+	return v, nil
 }
 
 func (s *VolunteerService) GetAllVolunteers() ([]Volunteer, error) {
-	return s.Repository.GetAllVolunteers()
+	volunteers, err := s.Repository.GetAllVolunteers()
+	if err != nil {
+		return []Volunteer{}, err
+	}
+	return volunteers, nil
 }
 
 func (s *VolunteerService) Notify(v Volunteer, message string) error {

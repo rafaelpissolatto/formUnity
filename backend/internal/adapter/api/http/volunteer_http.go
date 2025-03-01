@@ -2,6 +2,7 @@ package httpadapter
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/rafaelpissolatto/formUnity/backend/internal/domain/volunteer"
@@ -22,6 +23,10 @@ func NewVolunteerHandler(s *volunteer.VolunteerService) *VolunteerHandler {
 // NewVolunteerHandler creates a new VolunteerHandler
 func (h *VolunteerHandler) AddVolunteer(w http.ResponseWriter, r *http.Request) {
 	var v volunteer.Volunteer
+	if r.Body == nil {
+		http.Error(w, "Request body is empty", http.StatusBadRequest)
+		return
+	}
 	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -58,4 +63,5 @@ func (h *VolunteerHandler) GetAllVolunteers(w http.ResponseWriter, r *http.Reque
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	log.Println("Volunteers retrieved")
 }
